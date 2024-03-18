@@ -1,7 +1,7 @@
 
-import java.util.Arrays;
 /**
- * An object of this class stores an array of integers in elements. The client can access
+ * An object of this class allows to store an array of integer by linking differents objects as a set of nods. 
+ * Each object stores its value and the link another object, in elements. The client can access
  * to a copy of the array, add a value at the end of the array or delete its last value
  * 
  * @invar | getElements() != null
@@ -9,31 +9,70 @@ import java.util.Arrays;
 public class IntList {
 	
 	/**
-	 * @invar | elements != null
+	 * @invar | value != null
 	 */
-	private int[] elements;
+	private int value;
+	private IntList next;
 	
+
 	/**
-	 * returns a copy of the elements array.
-	 */
-	int[] getElements() {
-		return Arrays.copyOf(elements, elements.length);
-	}
-	
-	/**
-	 * Initializes the Intlist with a int[] array.
+	 * Initializes the Intlist with a int[] array. 
+	 * You will need to create as much nodes as the number of values there is
 	 * 
 	 * @pre | initialElements != null
 	 * 
-	 * @inspects | elements
+	 * @inspects | 
 	 * @post | GetElements() != null
 	 * @post | GetElements().length == initialElements.length
 	 * @post | Arrays.equals(GetElements(), initialElements)
 	 */
 	public IntList(int[] initialElements){
-		elements = initialElements;
+		this.value  = initialElements[0];
+		IntList current = this;
+		for (int i= 1; i < initialElements.length; i++) {
+			current.next = new IntList(initialElements[i]);
+			current = current.next;}
+	}
+			
+	/**
+	 * adds a node to an existing node
+	 */
+	private IntList(int value){
+		this.value = value;
+		this.next = null;
+				}
+
+	/**
+	 * return the size of the integer array linked to the Intlist.
+	 * @post | 0<= c
+	 */
+	
+	int arraySize() {
+		if (this.next == null)
+		    return 0;
+		  else
+		    return 1 + this.next.arraySize();
 	}
 
+	/**
+	 * returns a copy of the integer array linked to the Intlist .
+	 * @post | Array != null 
+	 */
+	
+	int[] getElements() {
+	    int[] array = new int[this.arraySize() + 1]; 
+	    int c = 0;
+	    IntList current = this;
+	    while (current != null) { 
+	        array[c] = current.value; 
+	        c += 1;
+	        current = current.next;
+	    }
+	    return array;
+	}
+
+			
+		
 	/**
 	 * Add a value at the end of the array elements
 	 * 
@@ -45,22 +84,19 @@ public class IntList {
 	 *
 	 */
 	public void addValue(int value) {
-		int[] newArray = new int[elements.length+1];
-		for (int i =0; i <elements.length; i++)
-			newArray[i] = elements[i];
-		newArray[elements.length] = value;
-		elements = newArray;
-
-		
-		
+		IntList current = this;
+		while (current.next != null){
+			current = current.next;}
+		current.next = new IntList(value);
 	}
-	
+
+
 	/**
 	 * Delete the last value of elements
 	 * 
 	 * @pre elements.length > 0
 	 * 
-	 * @mutates | elements
+	 * @mutates | one IntList.next
 	 * 
 	 * @post | elements.length = old(elements.length) -1
 	 * | IntStreamRange(0;elements.length).allMatch(i  -> elements[i]== old(elements)[i]
@@ -68,9 +104,12 @@ public class IntList {
 	 * 
 	 */
 	 public void supprValue() {
-		 int[] newArray = new int[elements.length-1];
-			for (int i =0; i <elements.length-1; i++)
-				newArray[i] = elements[i];
-			elements = newArray;
+		 IntList current = this;
+			while (current.next != null && current.next.next != null){
+				current = current.next;
+			}
+		current.next = null;
+				
+			
 	}
 }
